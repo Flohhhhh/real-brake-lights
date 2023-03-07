@@ -7,5 +7,9 @@ author "Floh"
 version "1.0.0"
 
 client_scripts {
-	'main.lua'
+	'client.lua'
+}
+
+server_scripts {
+	'server.lua'
 }
