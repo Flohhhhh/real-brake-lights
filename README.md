@@ -13,7 +13,10 @@ I made this pair with [Ultimate Lighting Controller](https://forum.cfx.re/t/free
 **DOWNLOAD**
 >- [**GitHub Release**](https://github.com/Flohhhhh/real-brake-lights/releases/latest)
 
-
+**INSTALLATION**
+- Download ``real-brake-lights.zip`` from [the latest release](https://github.com/Flohhhhh/real-brake-lights/releases/latest/)
+- Drag ``real-brake-lights`` to your resources folder
+- Add ``ensure real-brake-lights`` to your server.cfg
 
 [Video Preview](https://medal.tv/games/gta-v/clips/YtzVDdvY7j4IN/d13371dtHMed?invite=cr-MSxaMXYsMTU4OTMwMTkwLA)
 
