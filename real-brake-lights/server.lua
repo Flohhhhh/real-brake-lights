@@ -25,7 +25,7 @@ end)
 CreateThread(function()
     while true do Wait(1000)
         TriggerClientEvent("rbl:Sync", -1, vehicles)
-        print(#vehicles)
+        --print(#vehicles)
     end
 end)
 
