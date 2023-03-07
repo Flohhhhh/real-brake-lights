@@ -1,7 +1,7 @@
 local vehicles = {}
 
 RegisterNetEvent("rbl:AddVehicle", function(vehicle)
-	print("Adding vehicle: " .. json.encode(vehicle))
+	--print("Adding vehicle: " .. json.encode(vehicle))
 	local isAlready = false
 	for _, v in pairs(vehicles) do
 		if v.net == vehicle.net then
@@ -16,7 +16,7 @@ end)
 RegisterNetEvent('rbl:RemoveVehicle', function(vehicle)
     for k, v in pairs(vehicles) do
         if v.net == vehicle.net then
-            print("Removing vehicle: " .. json.encode(v))
+            --print("Removing vehicle: " .. json.encode(v))
             table.remove(vehicles, k)
         end
     end
@@ -32,10 +32,10 @@ end)
 CreateThread(function()
     while true do Wait(5000)
         for k, v in pairs(vehicles) do
-		if not DoesEntityExist(v.entity) then
-		print("Removing: " .. json.encode(v))
-			table.remove(vehicles, k)
-		end
+            if not DoesEntityExist(v.entity) then
+            --print("Removing: " .. json.encode(v))
+                table.remove(vehicles, k)
+            end
         end
     end
 end)
