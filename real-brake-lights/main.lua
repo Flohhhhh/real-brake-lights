@@ -2,7 +2,7 @@
 local threshold = 3
 
 CreateThread(function()
-    while true do Wait(250)
+    while true do Wait(0)
         local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
         if not vehicle then goto continue end
 
