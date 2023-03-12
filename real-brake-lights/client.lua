@@ -55,3 +55,24 @@ CreateThread(function()
         end
     end
 end)
+
+---------------
+-- NEW STUFF --
+---------------
+
+-- if my vehicle is stoped
+-- set it's state to stopped
+
+
+-- slow loop
+-- for each vehicle in game pool
+-- get its stopped state
+-- if its stopped
+    -- check if its already in my table of vehicles
+    -- if not -- add it
+    -- if it is -- do nothing
+    -- if its not stop
+-- if its not stopped
+    -- if its in the table
+    -- remove it
+
