@@ -3,7 +3,7 @@
 
 A simple script that enables brake lights while stopped on player vehicles.
 I made this pair with [Ultimate Lighting Controller](https://forum.cfx.re/t/free-ultimate-lighting-controller/4985223)!
-
+[Join Discord](https://discord.gg/zH3k624aSv)
 
 
 **FEATURES**
