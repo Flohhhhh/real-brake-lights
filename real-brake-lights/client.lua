@@ -15,6 +15,7 @@ local function brakeLightLoop()
     while not IsTableEmpty(vehicles) do
       for vehicle, _data in pairs(vehicles) do
         local entity = Entity(vehicle)
+        
         -- if vehicle exists, driver seat is occupied and vehicle isn't set to blackout, set brake lights
         if DoesEntityExist(vehicle) and not IsVehicleSeatFree(vehicle, -1) and not entity.state.rbl_blackout then
           SetVehicleBrakeLights(vehicle, true)
@@ -55,6 +56,7 @@ end)
 -----------------------
 
 local function onEnteredVehicle(_vehicle)
+  -- print("onEnteredVehicle")
   CreateThread(function()
     local ped = PlayerPedId()
     local vehicle = _vehicle
@@ -62,7 +64,11 @@ local function onEnteredVehicle(_vehicle)
     local brakeLights = false
 
     while true do
-      if GetVehiclePedIsIn(ped, false) ~= vehicle then break end -- if i'm not in the vehicle return
+      -- if i'm not in the vehicle return
+      if GetVehiclePedIsIn(ped, false) ~= vehicle then 
+        TriggerServerEvent("rbl:setBrakeLights", VehToNet(vehicle), false)
+        return 
+      end 
 
       local speed = GetEntitySpeed(vehicle) * 2.236936 -- get speed in MPH
       if speed <= threshold then
