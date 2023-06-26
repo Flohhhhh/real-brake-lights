@@ -10,6 +10,7 @@ I made this pair with [Ultimate Lighting Controller](https://forum.cfx.re/t/free
 **FEATURES**
 > - Syncs across vehicles
 > - Great performance (0.01 - 0.02 both client and server)
+> - ``/blackout`` command to disable brake lights until you move again (v1.1.0)
 
 **DOWNLOAD**
 >- [**GitHub Release**](https://github.com/Flohhhhh/real-brake-lights/releases/latest)
