@@ -1,4 +1,4 @@
-local threshold = 3 -- brake lights will turn on below this speed in MPH
+local threshold = 4 -- brake lights will turn on below this speed in MPH
 local vehicles = {}
 local isLoopActive = false
 
@@ -15,10 +15,11 @@ local function brakeLightLoop()
     while not IsTableEmpty(vehicles) do
       for vehicle, _data in pairs(vehicles) do
         local entity = Entity(vehicle)
-        
         -- if vehicle exists, driver seat is occupied and vehicle isn't set to blackout, set brake lights
-        if DoesEntityExist(vehicle) and not IsVehicleSeatFree(vehicle, -1) and not entity.state.rbl_blackout then
-          SetVehicleBrakeLights(vehicle, true)
+        if DoesEntityExist(vehicle) and not IsVehicleSeatFree(vehicle, -1) then
+          if not entity.state.rbl_blackout then
+            SetVehicleBrakeLights(vehicle, true)
+          end
         else
           vehicles[vehicle] = nil
         end
@@ -108,8 +109,10 @@ end)
 ----------------------
 
 RegisterCommand("blackout", function()
-  local entity = GetVehiclePedIsIn(PlayerPedId(), false)
-  local blackout = GetStateBagValue('rbl_blackout', entity)
+  local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
+  local entity = Entity(vehicle)
+  local blackout = entity.state.rbl_blackout
+  -- print("Setting blackout to: " .. tostring(not blackout))
   TriggerServerEvent("rbl:setBlackout", VehToNet(GetVehiclePedIsIn(PlayerPedId())), not blackout)
 end)
 
@@ -121,6 +124,8 @@ end)
 local ped = PlayerPedId()
 local vehicle = GetVehiclePedIsIn(ped, false)
 if vehicle then
+  TriggerServerEvent("rbl:setBrakeLights", VehToNet(vehicle), false)
+  Wait(0)
   onEnteredVehicle(vehicle)
 end
 
