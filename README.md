@@ -25,4 +25,4 @@ I made this pair with [Ultimate Lighting Controller](https://forum.cfx.re/t/free
 :clap:
 
 Credits:
-- [MadsLeander](https://github.com/MadsLeander)https://github.com/MadsLeander for most of the logic implemented in v1.1.0
+- [MadsLeander](https://github.com/MadsLeander) for most of the logic implemented in v1.1.0
