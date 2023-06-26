@@ -7,23 +7,18 @@ I made this pair with [Ultimate Lighting Controller](https://forum.cfx.re/t/free
 [Join Discord](https://discord.gg/zH3k624aSv)
 
 
-**FEATURES**
-> - Syncs across vehicles
-> - Great performance (0.01 - 0.02 both client and server)
-> - [v1.1.0] ``/blackout`` command to disable brake lights until you move again 
+## FEATURES
+- Syncs across vehicles
+- Great performance (0.01 - 0.02 both client and server)
+- [v1.1.0] ``/blackout`` command to disable brake lights until you move again 
 
-**DOWNLOAD**
->- [**GitHub Release**](https://github.com/Flohhhhh/real-brake-lights/releases/latest)
+[Video Preview](https://medal.tv/games/gta-v/clips/YtzVDdvY7j4IN/d13371dtHMed?invite=cr-MSxaMXYsMTU4OTMwMTkwLA)
 
-**INSTALLATION**
+## INSTALLATION
 - Download ``real-brake-lights.zip`` from [the latest release](https://github.com/Flohhhhh/real-brake-lights/releases/latest/)
 - Drag ``real-brake-lights`` to your resources folder
 - Add ``ensure real-brake-lights`` to your server.cfg
 
-[Video Preview](https://medal.tv/games/gta-v/clips/YtzVDdvY7j4IN/d13371dtHMed?invite=cr-MSxaMXYsMTU4OTMwMTkwLA)
-
-:clap:
-
-**CREDITS**
+## CREDITS
 
 [MadsLeander](https://github.com/MadsLeander) for most of the new logic implemented in v1.1.0
