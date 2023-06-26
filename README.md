@@ -23,3 +23,6 @@ I made this pair with [Ultimate Lighting Controller](https://forum.cfx.re/t/free
 [Video Preview](https://medal.tv/games/gta-v/clips/YtzVDdvY7j4IN/d13371dtHMed?invite=cr-MSxaMXYsMTU4OTMwMTkwLA)
 
 :clap:
+
+Credits:
+- [MadsLeander](https://github.com/MadsLeander)https://github.com/MadsLeander for most of the logic implemented in v1.1.0
