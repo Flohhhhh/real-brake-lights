@@ -1,41 +1,14 @@
-local vehicles = {}
-
-RegisterNetEvent("rbl:AddVehicle", function(vehicle)
-	--print("Adding vehicle: " .. json.encode(vehicle))
-	local isAlready = false
-	for _, v in pairs(vehicles) do
-		if v.net == vehicle.net then
-			isAlready = true
-		end
-	end
-	if not isAlready then
-		table.insert(vehicles, {net = vehicle.net, entity = NetworkGetEntityFromNetworkId(vehicle.net)})
-	end
+-- client tells server if their vehicle should have brake lights
+RegisterNetEvent("rbl:setBrakeLights")
+AddEventHandler("rbl:setBrakeLights", function(netId, state)
+    -- print("rbl:setBrakeLights")
+    local vehicle = NetworkGetEntityFromNetworkId(netId)
+    Entity(vehicle).state.rbl_brakelights = state
 end)
 
-RegisterNetEvent('rbl:RemoveVehicle', function(vehicle)
-    for k, v in pairs(vehicles) do
-        if v.net == vehicle.net then
-            --print("Removing vehicle: " .. json.encode(v))
-            table.remove(vehicles, k)
-        end
-    end
-end)
-
-CreateThread(function()
-    while true do Wait(1000)
-        TriggerClientEvent("rbl:Sync", -1, vehicles)
-        --print(#vehicles)
-    end
-end)
-
-CreateThread(function()
-    while true do Wait(5000)
-        for k, v in pairs(vehicles) do
-            if not DoesEntityExist(v.entity) then
-            --print("Removing: " .. json.encode(v))
-                table.remove(vehicles, k)
-            end
-        end
-    end
+RegisterNetEvent("rbl:setBlackout")
+AddEventHandler('rbl:setBlackout', function(netid, state)
+  -- print("Setting blackout")
+  local vehicle = NetworkGetEntityFromNetworkId(netid)
+  Entity(vehicle).state.rbl_blackout = state
 end)
