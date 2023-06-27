@@ -57,7 +57,8 @@ end)
 -----------------
 
 local function parkTimer()
-  local time = math.random(20000, 60000)
+  -- local time = math.random(20000, 60000)
+  local time = 4000
   local expiration = GetGameTimer() + time
   local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
   -- local entity = Entity(vehicle)
@@ -68,7 +69,7 @@ local function parkTimer()
         local speed = GetEntitySpeed(vehicle) * 2.236936 -- get speed in MPH
         if speed < 1 then
           -- print("Setting park state to true")
-          TriggerServerEvent("rbl:setParkState", VehToNet(vehicle), true)
+          TriggerServerEvent("rbl:setParked", VehToNet(vehicle), true)
           return
         else
           return
