@@ -1,4 +1,4 @@
-local threshold = 4 -- brake lights will turn on below this speed in MPH
+local threshold = Config.brakeLightThreshold
 local vehicles = {}
 local isLoopActive = false
 
@@ -57,8 +57,7 @@ end)
 -----------------
 
 local function parkTimer()
-  -- local time = math.random(20000, 60000)
-  local time = 4000
+  local time = math.random((Config.parkTimerMin * 1000), Config.parkTimerMax * 1000)
   local expiration = GetGameTimer() + time
   local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
   -- local entity = Entity(vehicle)
@@ -106,7 +105,9 @@ local function onEnteredVehicle(_vehicle)
           -- print("Enabling for my vehicle")
           brakeLights = true
           TriggerServerEvent('rbl:setBrakeLights', VehToNet(vehicle), true)
-          parkTimer()
+          if Config.enableParkEffect and (Config.parkTimerMax >= Config.parkTimerMin) then
+            parkTimer()
+          end
         end
       else -- if moving
         if brakeLights then
