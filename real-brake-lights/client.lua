@@ -64,15 +64,17 @@ local function parkTimer()
 
   CreateThread(function()
     while true do
-      local speed = GetEntitySpeed(vehicle) * 2.236936 -- get speed in MPH
-      if speed < 1 then
-        if GetGameTimer() > expiration then
+      if GetGameTimer() > expiration then
+        local speed = GetEntitySpeed(vehicle) * 2.236936 -- get speed in MPH
+        if speed < 1 then
           -- print("Setting park state to true")
           TriggerServerEvent("rbl:setParkState", VehToNet(vehicle), true)
           return
+        else
+          return
         end
       end
-      Wait(1000)
+      Wait(500)
     end
   end)
 end
@@ -98,14 +100,14 @@ local function onEnteredVehicle(_vehicle)
       end
 
       local speed = GetEntitySpeed(vehicle) * 2.236936 -- get speed in MPH
-      if speed <= threshold then
+      if speed <= threshold then -- if stopped
         if not brakeLights then -- if brake lights are not already on, turn them on and start a timer for park state
           -- print("Enabling for my vehicle")
           brakeLights = true
           TriggerServerEvent('rbl:setBrakeLights', VehToNet(vehicle), true)
           parkTimer()
         end
-      else
+      else -- if moving
         if brakeLights then
           -- print("Disabling for my vehicle")
           brakeLights = false
