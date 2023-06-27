@@ -71,10 +71,6 @@ local function parkTimer()
           TriggerServerEvent("rbl:setParkState", VehToNet(vehicle), true)
           return
         end
-      else
-        -- print("Setting park state to false")
-        TriggerServerEvent("rbl:setParkState", VehToNet(vehicle), false)
-        return
       end
       Wait(1000)
     end
@@ -117,6 +113,9 @@ local function onEnteredVehicle(_vehicle)
         end
         if entity.state.rbl_blackout then
           TriggerServerEvent('rbl:setBlackout', VehToNet(vehicle), false)
+        end
+        if entity.state.rbl_parked then
+          TriggerServerEvent('rbl:setParked', VehToNet(vehicle), false)
         end
       end
 
