@@ -64,15 +64,11 @@ local function parkTimer()
 
   CreateThread(function()
     while true do
+      if (GetEntitySpeed(vehicle) * 2.236936)  > 0 then return end
       if GetGameTimer() > expiration then
-        local speed = GetEntitySpeed(vehicle) * 2.236936 -- get speed in MPH
-        if speed < 1 then
-          -- print("Setting park state to true")
-          TriggerServerEvent("rbl:setParked", VehToNet(vehicle), true)
-          return
-        else
-          return
-        end
+        -- print("Setting park state to true")
+        TriggerServerEvent("rbl:setParked", VehToNet(vehicle), true)
+        return
       end
       Wait(500)
     end
