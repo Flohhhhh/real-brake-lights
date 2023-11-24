@@ -10,14 +10,16 @@ end
 -- loop through list of vehicles and set brake lights
 local function brakeLightLoop()
   CreateThread(function()
-    -- print("Loop")
+    --print("Loop started")
     isLoopActive = true
     while not IsTableEmpty(vehicles) do
       for vehicle, _data in pairs(vehicles) do
         local entity = Entity(vehicle)
         -- if vehicle exists, driver seat is occupied and vehicle isn't set to blackout, set brake lights
         if DoesEntityExist(vehicle) then -- if vehicle exists
-          if entity.state.rbl_blackout == 1 and not entity.state.rbl_parked then -- if not blackout or parked
+          --print(entity.state.rbl_blackout)
+          if entity.state.rbl_blackout == 1 or entity.state.rbl_blackout == nil and not entity.state.rbl_parked then -- if not blackout or parked
+            --print("Setting brake lights for vehicle")
             SetVehicleBrakeLights(vehicle, true)
           end
         else -- if vehicle doesn't exist, remove it from list
@@ -99,7 +101,7 @@ local function onEnteredVehicle(_vehicle)
       local speed = GetEntitySpeed(vehicle) * 2.236936 -- get speed in MPH
       if speed <= threshold then -- if stopped
         if not brakeLights then -- if brake lights are not already on, turn them on and start a timer for park state
-          -- print("Enabling for my vehicle")
+          --print("Enabling for my vehicle")
           brakeLights = true
           TriggerServerEvent('rbl:setBrakeLights', VehToNet(vehicle), true)
           if Config.enableParkEffect and (Config.parkTimerMax >= Config.parkTimerMin) then
@@ -108,7 +110,7 @@ local function onEnteredVehicle(_vehicle)
         end
       else -- if moving
         if brakeLights then
-          -- print("Disabling for my vehicle")
+          --print("Disabling for my vehicle")
           brakeLights = false
           TriggerServerEvent('rbl:setBrakeLights', VehToNet(vehicle), false)
         end
@@ -155,9 +157,9 @@ RegisterCommand("blackout", function()
   local blackout = entity.state.rbl_blackout
   print("Blackout current: " .. tostring(blackout))
   local newState
-  if blackout == 0 or blackout == nil then
+    if blackout == 0 then
     newState = 1
-  elseif blackout == 1 then
+  elseif blackout == 1 or blackout == nil then
     newState = 0
   end
   -- print("Setting blackout to: " .. tostring(newState))
