@@ -17,7 +17,7 @@ local function brakeLightLoop()
         local entity = Entity(vehicle)
         -- if vehicle exists, driver seat is occupied and vehicle isn't set to blackout, set brake lights
         if DoesEntityExist(vehicle) then -- if vehicle exists
-          if not entity.state.rbl_blackout and not entity.state.rbl_parked then -- if not blackout or parked
+          if entity.state.rbl_blackout == 1 and not entity.state.rbl_parked then -- if not blackout or parked
             SetVehicleBrakeLights(vehicle, true)
           end
         else -- if vehicle doesn't exist, remove it from list
@@ -78,6 +78,7 @@ end
 -----------------------
 -- HANDLE MY VEHICLE --
 -----------------------
+--TODO: DISABLE EFFECT IF W IS PRESSED
 
 -- when i enter a vehicle, start a loop to check if i'm driving and if so, check speed and set brake lights
 local function onEnteredVehicle(_vehicle)
@@ -111,8 +112,8 @@ local function onEnteredVehicle(_vehicle)
           brakeLights = false
           TriggerServerEvent('rbl:setBrakeLights', VehToNet(vehicle), false)
         end
-        if entity.state.rbl_blackout then
-          TriggerServerEvent('rbl:setBlackout', VehToNet(vehicle), false)
+        if entity.state.rbl_blackout == 0 then
+          TriggerServerEvent('rbl:setBlackout', VehToNet(vehicle), 1)
         end
         if entity.state.rbl_parked then
           TriggerServerEvent('rbl:setParked', VehToNet(vehicle), false)
@@ -138,12 +139,39 @@ end)
 -- BLACKOUT COMMAND --
 ----------------------
 
+local function setBlackout(newState)
+  print("setBlackout: " .. tostring(newState))
+  local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
+  if newState == 0 then
+    SetVehicleLights(vehicle, 1)
+  elseif newState == 1 then
+    SetVehicleLights(vehicle, 0)
+  end
+end
+
 RegisterCommand("blackout", function()
   local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
   local entity = Entity(vehicle)
   local blackout = entity.state.rbl_blackout
-  -- print("Setting blackout to: " .. tostring(not blackout))
-  TriggerServerEvent("rbl:setBlackout", VehToNet(GetVehiclePedIsIn(PlayerPedId())), not blackout)
+  print("Blackout current: " .. tostring(blackout))
+  local newState
+  if blackout == 0 or blackout == nil then
+    newState = 1
+  elseif blackout == 1 then
+    newState = 0
+  end
+  -- print("Setting blackout to: " .. tostring(newState))
+  TriggerServerEvent("rbl:setBlackout", VehToNet(GetVehiclePedIsIn(PlayerPedId())), newState)
+  -- trigger ULC event for compatibility
+  TriggerServerEvent("ulc:setBlackout", VehToNet(GetVehiclePedIsIn(PlayerPedId())), newState)
+end)
+
+AddStateBagChangeHandler('rbl_blackout', null, function(bagName, key, value)
+  Wait(0) -- Nedded as GetEntityFromStateBagName sometimes returns 0 on first frame
+  local vehicle = GetEntityFromStateBagName(bagName)
+  if vehicle == 0 then return end
+  local blackout = value
+  setBlackout(blackout)
 end)
 
 
