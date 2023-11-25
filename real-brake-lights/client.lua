@@ -80,7 +80,6 @@ end
 -----------------------
 -- HANDLE MY VEHICLE --
 -----------------------
---TODO: DISABLE EFFECT IF W IS PRESSED
 
 -- when i enter a vehicle, start a loop to check if i'm driving and if so, check speed and set brake lights
 local function onEnteredVehicle(_vehicle)
@@ -99,7 +98,7 @@ local function onEnteredVehicle(_vehicle)
       end
 
       local speed = GetEntitySpeed(vehicle) * 2.236936 -- get speed in MPH
-      if speed <= threshold then -- if stopped
+      if speed <= threshold and not IsControlPressed(0, 32) then -- if stopped
         if not brakeLights then -- if brake lights are not already on, turn them on and start a timer for park state
           --print("Enabling for my vehicle")
           brakeLights = true
