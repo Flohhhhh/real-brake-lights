@@ -11,6 +11,7 @@ I made this pair with [Ultimate Lighting Controller](https://forum.cfx.re/t/free
 - Syncs across vehicles
 - Great performance (0.01 - 0.02 both client and server)
 - [v1.1.0] ``/blackout`` command to disable brake lights until you move again 
+- [v1.2.0] Compatible with [ULC](https://github.com/Flohhhhh/ultimate-lighting-controller)!
 
 [Video Preview](https://medal.tv/games/gta-v/clips/YtzVDdvY7j4IN/d13371dtHMed?invite=cr-MSxaMXYsMTU4OTMwMTkwLA)
 
