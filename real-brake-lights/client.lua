@@ -91,6 +91,7 @@ local function onEnteredVehicle(_vehicle)
     local brakeLights = false
 
     while true do
+      
       -- if i'm not in the vehicle turn off its brake lights and return
       if GetVehiclePedIsIn(ped, false) ~= vehicle then
         TriggerServerEvent("rbl:setParked", VehToNet(vehicle), true)
@@ -98,6 +99,7 @@ local function onEnteredVehicle(_vehicle)
       end
 
       local speed = GetEntitySpeed(vehicle) * 2.236936 -- get speed in MPH
+      if vehicle == 0 then goto continue end -- if vehicle doesn't exist return
       if speed <= threshold and not IsControlPressed(0, 32) then -- if stopped
         if not brakeLights then -- if brake lights are not already on, turn them on and start a timer for park state
           --print("Enabling for my vehicle")
@@ -121,6 +123,7 @@ local function onEnteredVehicle(_vehicle)
         end
       end
 
+      ::continue::
       Wait(250)
     end
   end)
