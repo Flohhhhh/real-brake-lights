@@ -1,29 +1,35 @@
 local threshold = Config.brakeLightThreshold
 local vehicles = {}
+local vehicleCount = 0
 local isLoopActive = false
 
-local function IsTableEmpty(table)
-  for _ in pairs(table) do return false end
-  return true
-end
+local MPH_PER_MS = 2.236936
 
--- loop through list of vehicles and set brake lights
+-- Starts a background thread that periodically enforces brake-light state for all tracked vehicles.
+-- The thread runs while the global vehicleCount is greater than zero. For each tracked vehicle that
+-- still exists, brake lights are enabled when the vehicle's `rbl_blackout` state equals `1` or when
+-- `rbl_blackout` is `nil` and `rbl_parked` is false. Vehicles that no longer exist are removed from
+-- tracking and decrement the global vehicleCount. The global `isLoopActive` flag is set to `true`
+-- when the thread starts and cleared when it exits.
 local function brakeLightLoop()
   CreateThread(function()
     --print("Loop started")
     isLoopActive = true
-    while not IsTableEmpty(vehicles) do
+    while vehicleCount > 0 do
+      --print("Loop looping")
       for vehicle, _data in pairs(vehicles) do
-        local entity = Entity(vehicle)
-        -- if vehicle exists, driver seat is occupied and vehicle isn't set to blackout, set brake lights
-        if DoesEntityExist(vehicle) then -- if vehicle exists
-          --print(entity.state.rbl_blackout)
-          if entity.state.rbl_blackout == 1 or entity.state.rbl_blackout == nil and not entity.state.rbl_parked then -- if not blackout or parked
-            --print("Setting brake lights for vehicle")
+        -- if vehicle exists and vehicle isn't set to blackout/parked, set brake lights
+        if DoesEntityExist(vehicle) then
+          local entity = Entity(vehicle)
+          -- Note: Keep original precedence/behavior, just make it explicit.
+          if entity.state.rbl_blackout == 1 or (entity.state.rbl_blackout == nil and not entity.state.rbl_parked) then
             SetVehicleBrakeLights(vehicle, true)
           end
-        else -- if vehicle doesn't exist, remove it from list
-          vehicles[vehicle] = nil
+        else
+          if vehicles[vehicle] then
+            vehicles[vehicle] = nil
+            vehicleCount -= 1
+          end
         end
       end
       Wait(0)
@@ -42,21 +48,28 @@ AddStateBagChangeHandler('rbl_brakelights', null, function(bagName, key, value)
   local vehicle = GetEntityFromStateBagName(bagName)
   -- print("state changed for vehicle")
   if vehicle == 0 then return end
-  local brakeLights = value
-  if brakeLights then
-    vehicles[vehicle] = true
+  if value then
+    if not vehicles[vehicle] then
+      vehicles[vehicle] = true
+      vehicleCount += 1
+    end
     -- start loop if not already running
     if not isLoopActive then
      brakeLightLoop()
     end
   else
-    vehicles[vehicle] = nil
+    if vehicles[vehicle] then
+      vehicles[vehicle] = nil
+      vehicleCount -= 1
+    end
   end
 end)
 
 -----------------
 -- PARK EFFECT --
------------------
+-- Starts a background timer that, after a random duration between Config.parkTimerMin and Config.parkTimerMax seconds, marks the player's current vehicle as parked if the player remains the driver and the vehicle stays stationary.
+-- The timer is cancelled if the vehicle becomes invalid, the player leaves the vehicle, the player is no longer the driver, or the vehicle begins moving.
+-- On expiration the function triggers the server event "rbl:setParked" with the vehicle's network ID and `true`.
 
 local function parkTimer()
   local time = math.random((Config.parkTimerMin * 1000), Config.parkTimerMax * 1000)
@@ -66,7 +79,12 @@ local function parkTimer()
 
   CreateThread(function()
     while true do
-      if (GetEntitySpeed(vehicle) * 2.236936)  > 0 then return end
+      if vehicle == 0 or not DoesEntityExist(vehicle) then return end
+      local ped = PlayerPedId()
+      -- cancel if I left the vehicle or I'm no longer the driver
+      if GetVehiclePedIsIn(ped, false) ~= vehicle then return end
+      if GetPedInVehicleSeat(vehicle, -1) ~= ped then return end
+      if (GetEntitySpeed(vehicle) * MPH_PER_MS) > 0 then return end
       if GetGameTimer() > expiration then
         -- print("Setting park state to true")
         TriggerServerEvent("rbl:setParked", VehToNet(vehicle), true)
@@ -81,30 +99,50 @@ end
 -- HANDLE MY VEHICLE --
 -----------------------
 
--- when i enter a vehicle, start a loop to check if i'm driving and if so, check speed and set brake lights
+-- Starts a background loop that manages brake lights, parked state, and blackout for the specified vehicle while the player is driving it.
+-- The loop:
+--  - exits and clears brake lights when the player leaves the vehicle or stops being the driver,
+--  - enables brake lights and optionally starts the park timer when speed is at or below the configured threshold and the accelerate control is not pressed,
+--  - disables brake lights, sets blackout, and clears parked state when the vehicle is moving.
+-- Server events emitted: 'rbl:setBrakeLights', 'rbl:setParked', 'rbl:setBlackout'. The park timer is invoked when Config.enableParkEffect is true and park timer bounds are valid.
+-- @param _vehicle number The vehicle entity handle the player entered.
 local function onEnteredVehicle(_vehicle)
   -- print("onEnteredVehicle")
   CreateThread(function()
-    local ped = PlayerPedId()
     local vehicle = _vehicle
     local entity = Entity(vehicle)
+    local vehicleNet = VehToNet(vehicle)
     local brakeLights = false
 
     while true do
-      
+
+      local ped = PlayerPedId()
+
       -- if i'm not in the vehicle turn off its brake lights and return
       if GetVehiclePedIsIn(ped, false) ~= vehicle then
-        TriggerServerEvent("rbl:setParked", VehToNet(vehicle), true)
+        if brakeLights then
+          TriggerServerEvent('rbl:setBrakeLights', vehicleNet, false)
+        end
+        TriggerServerEvent("rbl:setParked", vehicleNet, true)
         return
       end
 
-      local speed = GetEntitySpeed(vehicle) * 2.236936 -- get speed in MPH
-      if vehicle == 0 then goto continue end -- if vehicle doesn't exist return
+      -- if I'm still in the vehicle but no longer the driver, stop managing it
+      if GetPedInVehicleSeat(vehicle, -1) ~= ped then
+        if brakeLights then
+          TriggerServerEvent('rbl:setBrakeLights', vehicleNet, false)
+        end
+        return
+      end
+
+      if vehicle == 0 or not DoesEntityExist(vehicle) then return end
+
+      local speed = GetEntitySpeed(vehicle) * MPH_PER_MS -- get speed in MPH
       if speed <= threshold and not IsControlPressed(0, 32) then -- if stopped
         if not brakeLights then -- if brake lights are not already on, turn them on and start a timer for park state
           --print("Enabling for my vehicle")
           brakeLights = true
-          TriggerServerEvent('rbl:setBrakeLights', VehToNet(vehicle), true)
+          TriggerServerEvent('rbl:setBrakeLights', vehicleNet, true)
           if Config.enableParkEffect and (Config.parkTimerMax >= Config.parkTimerMin) then
             parkTimer()
           end
@@ -113,17 +151,15 @@ local function onEnteredVehicle(_vehicle)
         if brakeLights then
           --print("Disabling for my vehicle")
           brakeLights = false
-          TriggerServerEvent('rbl:setBrakeLights', VehToNet(vehicle), false)
+          TriggerServerEvent('rbl:setBrakeLights', vehicleNet, false)
         end
         if entity.state.rbl_blackout == 0 then
-          TriggerServerEvent('rbl:setBlackout', VehToNet(vehicle), 1)
+          TriggerServerEvent('rbl:setBlackout', vehicleNet, 1)
         end
         if entity.state.rbl_parked then
-          TriggerServerEvent('rbl:setParked', VehToNet(vehicle), false)
+          TriggerServerEvent('rbl:setParked', vehicleNet, false)
         end
       end
-
-      ::continue::
       Wait(250)
     end
   end)
@@ -187,9 +223,24 @@ end)
 -- check my vehicle if i'm already in one when script starts
 local ped = PlayerPedId()
 local vehicle = GetVehiclePedIsIn(ped, false)
-if vehicle then
+if vehicle ~= 0 then
   TriggerServerEvent("rbl:setBrakeLights", VehToNet(vehicle), false)
   Wait(0)
   onEnteredVehicle(vehicle)
 end
 
+-- ensure we clean up our synced state if the resource stops while were driving
+AddEventHandler('onResourceStop', function(resourceName)
+  if resourceName ~= GetCurrentResourceName() then return end
+
+  local pedNow = PlayerPedId()
+  local vehNow = GetVehiclePedIsIn(pedNow, false)
+  if vehNow == 0 or not DoesEntityExist(vehNow) then return end
+  if GetPedInVehicleSeat(vehNow, -1) ~= pedNow then return end
+
+  local netId = VehToNet(vehNow)
+  if netId == 0 then return end
+
+  TriggerServerEvent('rbl:setBrakeLights', netId, false)
+  TriggerServerEvent('rbl:setParked', netId, true)
+end)
