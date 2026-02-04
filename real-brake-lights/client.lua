@@ -140,7 +140,6 @@ if Config.blackoutCommand ~= nil and Config.blackoutCommand ~= "" then
     local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
     local entity = Entity(vehicle)
     local blackout = entity.state.rbl_blackout
-    print("Blackout current: " .. tostring(blackout))
     local newState
       if blackout == 0 then
       newState = 1
