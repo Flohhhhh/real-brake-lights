@@ -4,8 +4,8 @@ Config = {
     this is to simulate the vehicle being put in park after some time of being stopped
   ]]
   enableParkEffect = true,
-  parkTimerMin = 30, -- must be less than parkTimerMax (default 15)
-  parkTimerMax = 90, -- must be greater than parkTimerMin (default 60)
+  parkTimerMin = 20, -- must be less than parkTimerMax (default 20)
+  parkTimerMax = 90, -- must be greater than parkTimerMin (default 90)
 
   --[[
     this is the speed at which the brake lights will turn off in MPH
@@ -14,7 +14,7 @@ Config = {
     higher values can make a more realistic effect and reduce gap between braking and stopping
   ]]
   brakeLightThreshold = 8, -- default 8
-  blackOutCommand = 'blackout', -- nil or '' to remove command
+  blackOutCommand = 'blackout', -- set value to nil or '' to disable the command
 
   -- Turn and Hazard signals
   enableSignals = true, -- enable or disable turn and hazard signals
