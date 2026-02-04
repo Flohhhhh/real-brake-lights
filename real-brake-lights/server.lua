@@ -1,7 +1,5 @@
--- client tells server if their vehicle should have brake lights
 RegisterNetEvent("rbl:setBrakeLights")
 AddEventHandler("rbl:setBrakeLights", function(netId, state)
-    -- print("[RBL] setBrakeLights")
     local vehicle = NetworkGetEntityFromNetworkId(netId)
   if vehicle == 0 or not DoesEntityExist(vehicle) then return end
     Entity(vehicle).state.rbl_brakelights = state
@@ -17,8 +15,14 @@ end)
 
 RegisterNetEvent("rbl:setParked")
 AddEventHandler("rbl:setParked", function(netId, state)
-  -- print("[RBL] setParked")
   local vehicle = NetworkGetEntityFromNetworkId(netId)
   if vehicle == 0 or not DoesEntityExist(vehicle) then return end
   Entity(vehicle).state.rbl_parked = state
+end)
+
+RegisterNetEvent("rbl:setIndicator")
+AddEventHandler("rbl:setIndicator", function(netId, state)
+  local vehicle = NetworkGetEntityFromNetworkId(netId)
+  if vehicle == 0 or not DoesEntityExist(vehicle) then return end
+  Entity(vehicle).state.rbl_indicator = state
 end)
