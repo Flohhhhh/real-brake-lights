@@ -15,10 +15,4 @@ Config = {
   ]]
   brakeLightThreshold = 8, -- default 8
   blackOutCommand = 'blackout', -- set value to nil or '' to disable the command
-
-  -- Turn and Hazard signals
-  enableSignals = true, -- enable or disable turn and hazard signals
-  leftSignalKey = 'LEFT', -- use LEFT for left arrow key
-  rightSignalKey = 'RIGHT', -- use RIGHT for right arrow key
-  hazardSignalKey = 'DOWN', -- use DOWN for down arrow key
 }

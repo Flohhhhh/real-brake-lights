@@ -31,8 +31,7 @@ AddStateBagChangeHandler('rbl_brakelights', nil, function(bagName, key, value)
       local ent = Entity(vehicle)
       vehicles[vehicle] = {
         blackout = ent.state.rbl_blackout,
-        parked = ent.state.rbl_parked,
-        indicator = ent.state.rbl_indicator or 0
+        parked = ent.state.rbl_parked
       }
     end
     if not isLoopActive then
@@ -173,66 +172,6 @@ AddStateBagChangeHandler('rbl_parked', nil, function(bagName, key, value)
   end
 end)
 
-local function setIndicator(vehicle, state)
-  if vehicle == 0 or not DoesEntityExist(vehicle) then return end
-  if state == 2 then
-    SetVehicleIndicatorLights(vehicle, 0, true)
-    SetVehicleIndicatorLights(vehicle, 1, false)
-  elseif state == 1 then  -- KEKW flipped
-    SetVehicleIndicatorLights(vehicle, 0, false)
-    SetVehicleIndicatorLights(vehicle, 1, true)
-  elseif state == 3 then
-    SetVehicleIndicatorLights(vehicle, 0, true)
-    SetVehicleIndicatorLights(vehicle, 1, true)
-  else
-    SetVehicleIndicatorLights(vehicle, 0, false)
-    SetVehicleIndicatorLights(vehicle, 1, false)
-  end
-end
-
-AddStateBagChangeHandler('rbl_indicator', nil, function(bagName, key, value)
-  Wait(0)
-  local vehicle = GetEntityFromStateBagName(bagName)
-  if vehicle == 0 then return end
-
-  if vehicles[vehicle] then
-    vehicles[vehicle].indicator = value or 0
-  end
-
-  setIndicator(vehicle, value or 0)
-end)
-
-if Config.enableSignals then
-  local function toggleIndicator(type)
-    local ped = PlayerPedId()
-    local vehicle = GetVehiclePedIsIn(ped, false)
-    if vehicle == 0 or GetPedInVehicleSeat(vehicle, -1) ~= ped then return end
-
-    local entity = Entity(vehicle)
-    local current = entity.state.rbl_indicator or 0
-    local newState = 0
-
-    if type == 'left' then
-      newState = (current == 1) and 0 or 1
-    elseif type == 'right' then
-      newState = (current == 2) and 0 or 2
-    elseif type == 'hazard' then
-      newState = (current == 3) and 0 or 3
-    end
-
-    TriggerServerEvent('rbl:setIndicator', VehToNet(vehicle), newState)
-  end
-
-  RegisterCommand('rbl_left', function() toggleIndicator('left') end, false)
-  RegisterKeyMapping('rbl_left', 'Vehicle Left Turn Signal', 'keyboard', Config.leftSignalKey)
-
-  RegisterCommand('rbl_right', function() toggleIndicator('right') end, false)
-  RegisterKeyMapping('rbl_right', 'Vehicle Right Turn Signal', 'keyboard', Config.rightSignalKey)
-
-  RegisterCommand('rbl_hazard', function() toggleIndicator('hazard') end, false)
-  RegisterKeyMapping('rbl_hazard', 'Vehicle Hazard Lights', 'keyboard', Config.hazardSignalKey)
-end
-
 local ped = PlayerPedId()
 local vehicle = GetVehiclePedIsIn(ped, false)
 if vehicle ~= 0 then
@@ -255,5 +194,4 @@ AddEventHandler('onResourceStop', function(resourceName)
 
   TriggerServerEvent('rbl:setBrakeLights', netId, false)
   TriggerServerEvent('rbl:setParked', netId, true)
-  TriggerServerEvent('rbl:setIndicator', netId, 0)
 end)

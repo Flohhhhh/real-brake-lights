@@ -19,10 +19,3 @@ AddEventHandler("rbl:setParked", function(netId, state)
   if vehicle == 0 or not DoesEntityExist(vehicle) then return end
   Entity(vehicle).state.rbl_parked = state
 end)
-
-RegisterNetEvent("rbl:setIndicator")
-AddEventHandler("rbl:setIndicator", function(netId, state)
-  local vehicle = NetworkGetEntityFromNetworkId(netId)
-  if vehicle == 0 or not DoesEntityExist(vehicle) then return end
-  Entity(vehicle).state.rbl_indicator = state
-end)
