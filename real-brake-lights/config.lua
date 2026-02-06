@@ -9,7 +9,7 @@ Config = {
 
   --[[
     this is the speed at which the brake lights will turn off in MPH
-    good values are beteween 3 - 20
+    good values are between 3 - 20
     lower values will make the brake lights more responsive
     higher values can make a more realistic effect and reduce gap between braking and stopping
   ]]
