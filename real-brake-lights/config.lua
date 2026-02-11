@@ -14,5 +14,5 @@ Config = {
     higher values can make a more realistic effect and reduce gap between braking and stopping
   ]]
   brakeLightThreshold = 8, -- default 8
-  blackOutCommand = 'blackout', -- set value to nil or '' to disable the command
+  blackoutCommand = 'blackout', -- set value to nil or '' to disable the command
 }

@@ -9,7 +9,7 @@ local function brakeLightLoop()
     while next(vehicles) do
       for vehicle, data in pairs(vehicles) do
         if DoesEntityExist(vehicle) then
-          if data.blackout == 1 or (data.blackout == nil and not data.parked) then
+          if (data.blackout == 1 or data.blackout == nil) and not data.parked then
             SetVehicleBrakeLights(vehicle, true)
           end
         else
